@@ -100,6 +100,7 @@ case $USERINPUT in
 
 	echo "changing config with sed."
     sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /var/lib/pgsql/data/postgresql.conf
+    # pgsql listen on default 5432
     sed -i 's/#port = 5432/port = 5432/g' /var/lib/pgsql/data/postgresql.conf
 
     sed -i 's/local/#local/g' /var/lib/pgsql/data/pg_hba.conf
@@ -109,6 +110,7 @@ case $USERINPUT in
     echo "host all all ::1/128 trust" >> /var/lib/pgsql/data/pg_hba.conf
 
     sed -i 's/Hostname=Zabbix proxy/Hostname=proxy/g' /etc/zabbix/zabbix_proxy.conf
+    # 192.168.56.130 - zabbix server - not proxy!
     sed -i 's/Server=127.0.0.1/Server=192.168.56.130/g' /etc/zabbix/zabbix_proxy.conf
     sed -i 's/DBName=zabbix_proxy/DBName=zabbix/g' /etc/zabbix/zabbix_proxy.conf
     sed -i 's/DBUser=zabbix/DBUser=zabbix/g' /etc/zabbix/zabbix_proxy.conf
