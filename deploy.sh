@@ -1,20 +1,20 @@
 #!/bin/bash
 
 ################################################################################################
-# Deploy zabbix proxy with psql db (Postgres)   					                           #
-# developed by tmiklu v1.0								                                       #
-# created for Descartes systems  				                                               #
+# Deploy zabbix proxy with psql db (Postgres)						       #
+# developed by tmiklu v1.0								       #
+# created for Descartes systems  				                               #
 ################################################################################################
 
 clear
 
 echo -e "\n
-	     \tWelcome in Zabbix proxy deployment tools \n
-	     \tTake action, press letter:\n
-	     \ta. Deploy fresh Zabbix proxy with psql db\n
+	 \tWelcome in Zabbix proxy deployment tools \n
+	 \tTake action, press letter:\n
+	 \ta. Deploy fresh Zabbix proxy with psql db\n
          \tb. Remove existing proxy and psql (Dangerous)\n
          \tc. Exit\n
-	    "
+	"
 
 read -p "Enter your option: " USERINPUT
 
