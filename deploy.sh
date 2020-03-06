@@ -3,8 +3,10 @@
 ################################################################################################
 # Deploy zabbix proxy with psql db (Postgres)                                                  #
 # developed by tmiklu v1.0					                               #
+# Still under construction                                                                     #
 # 				                                                               #
 ################################################################################################
+
 
 clear
 
@@ -17,8 +19,7 @@ echo -e "\n
          \tc. Exit\n
 	"
 
-read -p "Enter your option: " USERINPUT
-
+read -p $'\t\tEnter your option: ' -n 1 -r USERINPUT
 
 YUM=/usr/bin/yum
 
@@ -28,7 +29,8 @@ case $USERINPUT in
   ### CASE "A"
   ##
   #
-  a)
+  a) 
+    read -p "Enter proxy name for datacenter: " PROXYDC
     echo "Checking Selinux status..."
     SELINUXSTATUS=$(getenforce)
 
@@ -41,17 +43,17 @@ case $USERINPUT in
       echo -e "SElinux is in permissive mode. No action required"
     fi
 
-	echo -e "-------> let's update repos"
-	$YUM update -y > /dev/null
+	  echo -e "-------> let's update repos"
+	  $YUM update -y > /dev/null
 
-	# add repo for zabbix LTS 4.0
-	REPOZABBIX=$(yum repolist enabled | grep -Po 'zabbix\/x86\_64' | wc -l)
+	  # add repo for zabbix LTS 4.0
+	  REPOZABBIX=$(yum repolist enabled | grep -Po 'zabbix\/x86\_64' | wc -l)
 
-	if [ $REPOZABBIX == 1 ] 
+	  if [ $REPOZABBIX == 1 ] 
      then
       echo "Repo zabbix exists..."
     else
- 	  echo "Adding repo zabbix LTS 4.0"
+ 	    echo "Adding repo zabbix LTS 4.0"
       rpm -Uvh https://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-2.el7.noarch.rpm
     fi
         
@@ -70,7 +72,7 @@ case $USERINPUT in
 
     if [ $ZABBIXPROXY == 1 ]
      then
-	  echo -e "Installed =$(rpm -qa | grep -P 'zabbix\-proxy\-pgsql\-4\.0\.18\-1\.el7\.x86\_64')"
+	    echo -e "Installed =$(rpm -qa | grep -P 'zabbix\-proxy\-pgsql\-4\.0\.18\-1\.el7\.x86\_64')"
     else
    	  echo -e "Installing zabbix-proxy-pgsql..."
       $YUM install zabbix-proxy-pgsql-4.0.18-1.el7.x86_64 -y
@@ -87,7 +89,26 @@ case $USERINPUT in
       $YUM install postgresql-server -y
     fi
 
-    # init postgres db store
+    # add epel release
+    EPELREPO=$(yum repolist | grep -i 'Extra Packages for Enterprise Linux')
+
+    if [ $EPELREPO == 1 ]
+     then
+      echo -e "Epel repo exists..."
+    else
+      echo -e "Adding Repo Epel"
+      $YUM install epel-release -y
+    fi
+
+    # install jq from epel release
+    $YUM install jq -y
+
+    #
+    ##
+    ### init postgres db store
+    ##
+    #
+
     postgresql-setup initdb
     
     # working directory
@@ -96,27 +117,55 @@ case $USERINPUT in
     # backup config
     echo "backup config to /var/lib/pgsql/data/postgresql.conf.bak"
     cp -pa /var/lib/pgsql/data/postgresql.conf /var/lib/pgsql/data/postgresql.conf.bak
-    cp -pa /var/lib/pgsql/data/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf.bak
+    
 
-	echo "changing config with sed."
+	  echo "changing config with sed."
     sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /var/lib/pgsql/data/postgresql.conf
     # pgsql listen on default 5432
     sed -i 's/#port = 5432/port = 5432/g' /var/lib/pgsql/data/postgresql.conf
 
-    sed -i 's/local/#local/g' /var/lib/pgsql/data/pg_hba.conf
-    sed -i 's/host/#host/g' /var/lib/pgsql/data/pg_hba.conf
-    echo "local all all trust" >> /var/lib/pgsql/data/pg_hba.conf
-    echo "host all all 127.0.0.1/32 trust" >> /var/lib/pgsql/data/pg_hba.conf
-    echo "host all all ::1/128 trust" >> /var/lib/pgsql/data/pg_hba.conf
 
-    sed -i 's/Hostname=Zabbix proxy/Hostname=proxy/g' /etc/zabbix/zabbix_proxy.conf
+
+
+
+    # backup pg_hba.conf
+    cp -pa /var/lib/pgsql/data/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf.orig
+
+    # create
+    cat <<EOF > /var/lib/pgsql/data/pg_hba.conf
+    local   all             all                                     trust
+    host    all             all             127.0.0.1/32            trust
+    host    all             all             ::1/128                 trust
+EOF
+    #sed -i 's/Hostname=Zabbix proxy/Hostname='"${PROXYDC}"'/g' /etc/zabbix/zabbix_proxy.conf
     # 192.168.56.130 - zabbix server - not proxy!
-    sed -i 's/Server=127.0.0.1/Server=192.168.56.130/g' /etc/zabbix/zabbix_proxy.conf
-    sed -i 's/DBName=zabbix_proxy/DBName=zabbix/g' /etc/zabbix/zabbix_proxy.conf
-    sed -i 's/DBUser=zabbix/DBUser=zabbix/g' /etc/zabbix/zabbix_proxy.conf
-    sed -i 's/# DBPassword=/DBPassword=zabbix/g' /etc/zabbix/zabbix_proxy.conf
-    sed -i 's/# DBPort=/DBPort=5432/g' /etc/zabbix/zabbix_proxy.conf
+    #sed -i 's/Server=127.0.0.1/Server=brppzbm01.prd.dsg-internal/g' /etc/zabbix/zabbix_proxy.conf
+    #sed -i 's/DBName=zabbix_proxy/DBName=zabbix/g' /etc/zabbix/zabbix_proxy.conf
+    #sed -i 's/DBUser=zabbix/DBUser=zabbix/g' /etc/zabbix/zabbix_proxy.conf
+    #sed -i 's/# DBPassword=/DBPassword=7yL[U9$p&w/g' /etc/zabbix/zabbix_proxy.conf
+    #sed -i 's/# DBPort=/DBPort=5432/g' /etc/zabbix/zabbix_proxy.conf
 
+    cp -pa /etc/zabbix/zabbix_proxy.conf /etc/zabbix/zabbix_proxy.conf.bak
+
+    chmod 0640 /etc/zabbix/zabbix_proxy.conf
+
+    # add zabbix proxy config
+cat <<EOF > /etc/zabbix/zabbix_proxy.conf
+Server=brppzbm01.prd.dsg-internal
+Hostname=${PROXYDC}
+LogFile=/var/log/zabbix/zabbix_proxy.log
+LogFileSize=0
+PidFile=/var/run/zabbix/zabbix_proxy.pid
+SocketDir=/var/run/zabbix
+DBName=zabbix
+DBUser=zabbix
+DBPassword=7yL[U9$p#
+DBPort=5432
+SNMPTrapperFile=/var/log/snmptrap/snmptrap.log
+Timeout=4
+ExternalScripts=/usr/lib/zabbix/externalscripts
+LogSlowQueries=3000
+EOF
 
     # enable and start zabbix proxy
     systemctl enable zabbix-proxy && systemctl start zabbix-proxy 
@@ -126,10 +175,10 @@ case $USERINPUT in
 
     # create database, user zabbix and grant privileges
     sudo su postgres <<EOF
-    psql -c "alter user postgres with password 'zabbix';"
+    psql -c "alter user postgres with password '7yL[U9$p&w';"
     psql -c "create user zabbix;"
     psql -c "create database zabbix owner zabbix;"
-    psql -c "alter user zabbix with password 'zabbix';"
+    psql -c "alter user zabbix with password '7yL[U9$p&w';"
     psql -c "grant all privileges on database zabbix to zabbix;"
 EOF
 
@@ -138,6 +187,11 @@ EOF
     # unzip schema content to postgres
     zcat /usr/share/doc/zabbix-proxy-pgsql-4.0.18/schema.sql.gz | psql -U zabbix -d zabbix
 
+    # api auth.
+    curl -i -s -X POST -H "Content-Type:application/json" echo http://brppzbm01.prd.dsg-internal/zabbix/api_jsonrpc.php -d \
+    ' {"jsonrpc": "2.0", "method": "user.login", "params": { "user": "Admin", "password": "zabbix" }, "id": 1 }' | egrep result > /tmp/auth
+
+    curl -i -s -X POST -H "Content-Type:application/json" echo http://brppzbm01.prd.dsg-internal/zabbix/api_jsonrpc.php -d ' {"jsonrpc": "2.0", "method": "proxy.create", "params": { "host": "'"${PROXYDC}"'", "status": "5" }, "auth": '$(cat /tmp/auth | jq .'result')', "id": 1 }'
     ;;
   
   #
