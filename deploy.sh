@@ -141,7 +141,9 @@ EOF
 
     # add zabbix proxy config
 cat <<EOF > /etc/zabbix/zabbix_proxy.conf
-Server=brppzbm01.prd.dsg-internal
+# user your own zabbix server
+Server=zabbix-server
+# case sensitive - same must be on zabbix gui proxy setting
 Hostname=${PROXYDC}
 LogFile=/var/log/zabbix/zabbix_proxy.log
 LogFileSize=0
@@ -149,7 +151,7 @@ PidFile=/var/run/zabbix/zabbix_proxy.pid
 SocketDir=/var/run/zabbix
 DBName=zabbix
 DBUser=zabbix
-DBPassword=7yL[U9$p#
+DBPassword=password
 DBPort=5432
 SNMPTrapperFile=/var/log/snmptrap/snmptrap.log
 Timeout=4
@@ -165,10 +167,10 @@ EOF
 
     # create database, user zabbix and grant privileges
     sudo su postgres <<EOF
-    psql -c "alter user postgres with password '7yL[U9$p&w';"
+    psql -c "alter user postgres with password 'password';"
     psql -c "create user zabbix;"
     psql -c "create database zabbix owner zabbix;"
-    psql -c "alter user zabbix with password '7yL[U9$p&w';"
+    psql -c "alter user zabbix with password 'password';"
     psql -c "grant all privileges on database zabbix to zabbix;"
 EOF
 
