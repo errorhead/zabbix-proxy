@@ -59,7 +59,7 @@ case $USERINPUT in
         
     # add repo for psql
     REPOPSQL=$(yum repolist | grep -iPo 'pgdg96')
-   	if [ $REPOPSQL == 1 ]
+   if [ $REPOPSQL == 1 ]
      then
        echo "Repo pgsql exists..."
     else
@@ -119,7 +119,7 @@ case $USERINPUT in
     cp -pa /var/lib/pgsql/data/postgresql.conf /var/lib/pgsql/data/postgresql.conf.bak
     
 
-	  echo "changing config with sed."
+    echo "changing config with sed."
     sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /var/lib/pgsql/data/postgresql.conf
     # pgsql listen on default 5432
     sed -i 's/#port = 5432/port = 5432/g' /var/lib/pgsql/data/postgresql.conf
@@ -128,7 +128,7 @@ case $USERINPUT in
     # backup pg_hba.conf
     cp -pa /var/lib/pgsql/data/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf.orig
 
-    # create
+    # create config for pg_hba
     cat <<EOF > /var/lib/pgsql/data/pg_hba.conf
     local   all             all                                     trust
     host    all             all             127.0.0.1/32            trust
