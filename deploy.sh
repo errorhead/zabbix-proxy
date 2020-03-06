@@ -180,10 +180,10 @@ EOF
     zcat /usr/share/doc/zabbix-proxy-pgsql-4.0.18/schema.sql.gz | psql -U zabbix -d zabbix
 
     # api auth.
-    curl -i -s -X POST -H "Content-Type:application/json" echo http://brppzbm01.prd.dsg-internal/zabbix/api_jsonrpc.php -d \
+    curl -i -s -X POST -H "Content-Type:application/json" echo http://zabbix.server.com/zabbix/api_jsonrpc.php -d \
     ' {"jsonrpc": "2.0", "method": "user.login", "params": { "user": "Admin", "password": "zabbix" }, "id": 1 }' | egrep result > /tmp/auth
 
-    curl -i -s -X POST -H "Content-Type:application/json" echo http://brppzbm01.prd.dsg-internal/zabbix/api_jsonrpc.php -d ' {"jsonrpc": "2.0", "method": "proxy.create", "params": { "host": "'"${PROXYDC}"'", "status": "5" }, "auth": '$(cat /tmp/auth | jq .'result')', "id": 1 }'
+    curl -i -s -X POST -H "Content-Type:application/json" echo http://zabbix.server.com/zabbix/api_jsonrpc.php -d ' {"jsonrpc": "2.0", "method": "proxy.create", "params": { "host": "'"${PROXYDC}"'", "status": "5" }, "auth": '$(cat /tmp/auth | jq .'result')', "id": 1 }'
     ;;
   
   #
