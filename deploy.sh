@@ -49,7 +49,7 @@ case $USERINPUT in
 	  # add repo for zabbix LTS 4.0
 	  REPOZABBIX=$(yum repolist enabled | grep -Po 'zabbix\/x86\_64' | wc -l)
 
-	  if [ $REPOZABBIX == 1 ] 
+    if [ $REPOZABBIX == 1 ] 
      then
       echo "Repo zabbix exists..."
     else
@@ -125,9 +125,6 @@ case $USERINPUT in
     sed -i 's/#port = 5432/port = 5432/g' /var/lib/pgsql/data/postgresql.conf
 
 
-
-
-
     # backup pg_hba.conf
     cp -pa /var/lib/pgsql/data/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf.orig
 
@@ -137,13 +134,6 @@ case $USERINPUT in
     host    all             all             127.0.0.1/32            trust
     host    all             all             ::1/128                 trust
 EOF
-    #sed -i 's/Hostname=Zabbix proxy/Hostname='"${PROXYDC}"'/g' /etc/zabbix/zabbix_proxy.conf
-    # 192.168.56.130 - zabbix server - not proxy!
-    #sed -i 's/Server=127.0.0.1/Server=brppzbm01.prd.dsg-internal/g' /etc/zabbix/zabbix_proxy.conf
-    #sed -i 's/DBName=zabbix_proxy/DBName=zabbix/g' /etc/zabbix/zabbix_proxy.conf
-    #sed -i 's/DBUser=zabbix/DBUser=zabbix/g' /etc/zabbix/zabbix_proxy.conf
-    #sed -i 's/# DBPassword=/DBPassword=7yL[U9$p&w/g' /etc/zabbix/zabbix_proxy.conf
-    #sed -i 's/# DBPort=/DBPort=5432/g' /etc/zabbix/zabbix_proxy.conf
 
     cp -pa /etc/zabbix/zabbix_proxy.conf /etc/zabbix/zabbix_proxy.conf.bak
 
