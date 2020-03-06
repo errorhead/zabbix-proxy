@@ -12,7 +12,7 @@ clear
 
 echo -e "\n
 	 \tWelcome in Zabbix proxy deployment tools \n
-         \tThis tools will deploy zabbix proxy to Zabbix master server (Brampton)\n
+         \tThis tools will deploy zabbix proxy to Zabbix master server\n
 	 \tTake action, press letter:\n
 	 \ta. Deploy fresh Zabbix proxy with psql db\n
          \tb. Remove existing proxy and psql (Dangerous)\n
