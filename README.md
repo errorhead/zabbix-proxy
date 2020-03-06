@@ -1,4 +1,5 @@
-# auto-deploy for zabbix-proxy and postgresql
+# auto-deploy for zabbix-proxy and postgresql  
+# currently only Red Hat 7+ family OS are supported
 clone/download  
 chmod +x deploy.sh  
 
