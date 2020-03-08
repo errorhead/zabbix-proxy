@@ -10,14 +10,14 @@
 clear
 
 echo -e "\n
-	       \tWelcome in Zabbix proxy deployment tools \n
+	 \tWelcome in Zabbix proxy deployment tools \n
          \tThis tools will deploy zabbix proxy to Zabbix master server\n
-	       \tTake action, press letter:\n
+	 \tTake action, press letter:\n
          \t1. Deploy master Zabbix server (Frontend,backend and PSQL(DB))\n
-	       \t2. Deploy fresh Zabbix proxy with psql db\n
+	 \t2. Deploy fresh Zabbix proxy with psql db\n
          \t3. Remove existing proxy and psql (Dangerous)\n
          \te. Exit\n
-	      "
+	"
 
 read -p $'\t\tEnter your option: ' -n 1 -r USERINPUT
 
