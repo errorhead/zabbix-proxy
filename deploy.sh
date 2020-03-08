@@ -2,9 +2,9 @@
 
 ################################################################################################
 # Deploy zabbix proxy with psql db (Postgres)                                                  #
-# developed by tmiklu v1.0					                                                           #
+# developed by tmiklu v1.0					                               #
 # Still under construction                                                                     #
-# 				                                                                                     #
+# 				                                                               #
 ################################################################################################
 
 clear
@@ -34,7 +34,7 @@ case $USERINPUT in
 
     #
     ##
-    ### enter name for 
+    ### enter name for proxy server
     ##
     #
     read -p "Enter proxy server name for datacenter: " PROXYDC
