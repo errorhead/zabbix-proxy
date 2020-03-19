@@ -44,6 +44,7 @@ case $USERINPUT in
     ### selinux
     ##
     #
+    ./selinux.sh
 
     #
     ##
